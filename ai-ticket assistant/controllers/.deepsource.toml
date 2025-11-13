@@ -1,0 +1,17 @@
+version = 1
+
+[[analyzers]]
+name = "javascript"
+enabled = true
+path = "ai-ticket-assistant/"
+
+  [analyzers.meta]
+  environment = ["nodejs"]
+
+[[analyzers]]
+name = "javascript"
+enabled = true
+path = "ai-ticket-frontend/"
+
+  [analyzers.meta]
+  environment = ["browser"]

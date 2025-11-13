@@ -2,4 +2,6 @@ import React  from "react";
 
 
 function CheckAuth() {
-    return <div></div>
+    return <div>check Auth</div>
+}
+export default CheckAuth;
