@@ -15,7 +15,7 @@ function Admin() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/auth/admin`, {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/auth/admin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

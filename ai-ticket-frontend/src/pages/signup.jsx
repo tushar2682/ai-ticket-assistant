@@ -15,7 +15,7 @@ function Signup() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/auth/signup`, {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

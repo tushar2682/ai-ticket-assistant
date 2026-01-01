@@ -1,9 +1,10 @@
-import React, { useEffect }  from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 
-function Auth({children, protectedRoute}) {
-    const navigate=useNavigate();
-    const[loading, setLoading]=useState(true);
+function Auth({children, protected: protectedRoute}) {
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
     useEffect(()=>{
         const token=localStorage.getItem("token");
         if(!token && protectedRoute){
