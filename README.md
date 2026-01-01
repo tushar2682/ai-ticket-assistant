@@ -645,3 +645,289 @@ The system uses MongoDB's `$elemMatch` operator with regex to:
 - Fallback to admin if no match found
 
 ---
+
+## 👥 User Roles
+
+### User
+- Can create tickets
+- Can view their own tickets
+- Cannot assign or modify ticket status
+- Basic access to the system
+
+### Moderator
+- All user permissions
+- Can be assigned tickets automatically
+- Can view assigned tickets
+- Can update ticket status
+- Should have skills defined in their profile
+
+### Admin
+- All moderator permissions
+- Can view all tickets
+- Can assign tickets manually
+- Full system access
+- Receives tickets when no matching moderator is found
+
+---
+
+## 💻 Development
+
+### Development Setup
+
+1. **Install Dependencies**
+   ```bash
+   # Backend
+   cd "ai-ticket assistant"
+   npm install
+
+   # Frontend
+   cd ../ai-ticket-frontend
+   npm install
+   ```
+
+2. **Environment Setup**
+   - Copy `.env sample` to `.env`
+   - Fill in all required environment variables
+   - Ensure MongoDB is running
+
+3. **Run Development Servers**
+   ```bash
+   # Terminal 1: Backend
+   cd "ai-ticket assistant"
+   npm start  # or npm run dev if configured
+
+   # Terminal 2: Inngest (if using background jobs)
+   npm run inngest-dev
+
+   # Terminal 3: Frontend
+   cd ai-ticket-frontend
+   npm run dev
+   ```
+
+### Code Style
+
+- Follow ESLint configuration
+- Use consistent indentation (2 spaces)
+- Write descriptive variable and function names
+- Add comments for complex logic
+- Follow RESTful API conventions
+
+### Testing
+
+```bash
+# Run linting
+cd ai-ticket-frontend
+npm run lint
+
+# Check backend (if test scripts are added)
+cd "ai-ticket assistant"
+npm test
+```
+
+### Debugging
+
+- Use `console.log()` for debugging (remove before committing)
+- Check MongoDB logs for database issues
+- Review Inngest dashboard for background job status
+- Check browser console for frontend errors
+- Verify environment variables are loaded correctly
+
+---
+
+## 🔐 Environment Variables Reference
+
+### Required Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `MONGO_URL` | MongoDB connection string | `mongodb://localhost:27017/ai-ticket-assistant` |
+| `JWT_SECRET` | Secret key for JWT token signing | `your-super-secret-key` |
+| `GEMINI_API_KEY` | Google Gemini API key | `AIza...` |
+
+### Optional Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `PORT` | Server port number | `3000` |
+| `APP_URL` | Application base URL | `http://localhost:3000` |
+| `MAILTRAP_SMTP_HOST` | SMTP server host | `sandbox.smtp.mailtrap.io` |
+| `MAILTRAP_SMTP_PORT` | SMTP server port | `2525` |
+| `MAILTRAP_SMTP_USER` | SMTP username | `your_username` |
+| `MAILTRAP_SMTP_PASS` | SMTP password | `your_password` |
+
+---
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+#### 1. MongoDB Connection Error
+
+**Error:** `Error connecting to MongoDB`
+
+**Solutions:**
+- Verify MongoDB is running: `mongosh` or check service status
+- Check connection string in `.env` file
+- Ensure network access if using MongoDB Atlas
+- Verify credentials are correct
+
+#### 2. Gemini API Error
+
+**Error:** `Failed to parse JSON` or API errors
+
+**Solutions:**
+- Verify `GEMINI_API_KEY` is set correctly in `.env`
+- Check API key is valid and not expired
+- Ensure API key has proper permissions
+- Check API rate limits
+
+#### 3. Inngest Functions Not Running
+
+**Error:** Background jobs not executing
+
+**Solutions:**
+- Ensure Inngest dev server is running: `npm run inngest-dev`
+- Check Inngest event is being triggered
+- Verify Inngest function registration in `index.js`
+- Check Inngest dashboard for errors
+
+#### 4. Authentication Issues
+
+**Error:** `Unauthorized` or token errors
+
+**Solutions:**
+- Verify JWT token is being sent in headers
+- Check `JWT_SECRET` matches between token creation and verification
+- Ensure token hasn't expired
+- Verify authentication middleware is applied correctly
+
+#### 5. Email Not Sending
+
+**Error:** Email notifications not received
+
+**Solutions:**
+- Check SMTP credentials in `.env`
+- Verify Mailtrap account is active (for development)
+- Check email service logs
+- Ensure transporter configuration in `mailer.js`
+
+#### 6. Port Already in Use
+
+**Error:** `EADDRINUSE: address already in use`
+
+**Solutions:**
+- Change `PORT` in `.env` file
+- Kill process using the port:
+  ```bash
+  # Windows
+  netstat -ano | findstr :3000
+  taskkill /PID <PID> /F
+
+  # macOS/Linux
+  lsof -ti:3000 | xargs kill -9
+  ```
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how you can help:
+
+### Contribution Guidelines
+
+1. **Fork the Repository**
+   - Fork the project to your GitHub account
+   - Clone your fork locally
+
+2. **Create a Feature Branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+3. **Make Your Changes**
+   - Write clean, readable code
+   - Follow existing code style
+   - Add comments where necessary
+   - Update documentation if needed
+
+4. **Test Your Changes**
+   - Test locally before submitting
+   - Ensure no breaking changes
+   - Check for linting errors
+
+5. **Commit Your Changes**
+   ```bash
+   git commit -m "Add: descriptive commit message"
+   ```
+   Use conventional commit messages:
+   - `Add:` for new features
+   - `Fix:` for bug fixes
+   - `Update:` for updates to existing features
+   - `Docs:` for documentation changes
+   - `Refactor:` for code refactoring
+
+6. **Push and Create Pull Request**
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+   - Create a pull request on GitHub
+   - Describe your changes clearly
+   - Reference any related issues
+
+### Areas for Contribution
+
+- 🐛 Bug fixes
+- ✨ New features
+- 📝 Documentation improvements
+- 🎨 UI/UX enhancements
+- ⚡ Performance optimizations
+- 🧪 Test coverage
+- 🔒 Security improvements
+
+---
+
+## 📄 License
+
+This project is licensed under the **ISC License**.
+
+---
+
+### Reporting Bugs
+
+When reporting bugs, please include:
+- Description of the issue
+- Steps to reproduce
+- Expected behavior
+- Actual behavior
+- Environment details (OS, Node version, etc.)
+- Error messages or logs
+
+### Feature Requests
+
+We'd love to hear your ideas! Open an issue with:
+- Feature description
+- Use case
+- Proposed implementation (if you have ideas)
+
+---
+
+## 🙏 Acknowledgments
+
+- [Google Gemini AI](https://deepmind.google/technologies/gemini/) for AI capabilities
+- [Inngest](https://www.inngest.com/) for background job processing
+- [MongoDB](https://www.mongodb.com/) for database solution
+- [Express.js](https://expressjs.com/) community
+- [React](https://reactjs.org/) team
+- All contributors and users of this project
+
+---
+
+<div align="center">
+
+**Built with ❤️ by the AI Ticket Assistant Team**
+
+⭐ **Star this repo if you find it useful!** ⭐
+
+[Report Bug](https://github.com/your-username/ai-ticket-assistant/issues) · [Request Feature](https://github.com/your-username/ai-ticket-assistant/issues) · [Documentation](#-documentation)
+
+</div>
