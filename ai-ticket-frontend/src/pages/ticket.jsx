@@ -15,7 +15,7 @@ function Ticket() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/tickets/create`, {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/tickets`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
