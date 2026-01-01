@@ -1,164 +1,93 @@
-﻿# Project Title
+﻿# 🎫 AI Ticket Assistant
 
-# 🎫 AI Ticketing Application
+<div align="center">
 
-An **AI-powered Ticketing System** that automatically creates, categorizes, prioritizes, and responds to support tickets using **OpenAI APIs**. This application helps teams handle customer queries faster by leveraging AI for intelligent routing, summarization, and auto-replies.
+**An Intelligent AI-Powered Ticketing System**
 
----
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-5.1-blue.svg)](https://expressjs.com/)
+[![React](https://img.shields.io/badge/React-19.1-blue.svg)](https://reactjs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Latest-green.svg)](https://www.mongodb.com/)
+[![License](https://img.shields.io/badge/License-ISC-blue.svg)](LICENSE)
 
-## 🚀 Features
+*Automatically analyze, categorize, prioritize, and route support tickets using Google Gemini AI*
 
-* 🤖 AI-generated ticket summaries
-* 🏷️ Automatic ticket categorization (Bug, Feature, Billing, Support, etc.)
-* ⚡ Priority detection (Low / Medium / High / Critical)
-* ✉️ AI-based suggested responses
-* 📊 Dashboard for ticket tracking
-* 🔐 Secure API key handling using environment variables
-* 🌐 REST API support
+</div>
 
 ---
 
-## 🏗️ Tech Stack
+## 📋 Table of Contents
 
-**Backend**
-
-* Spring Boot / Node.js (Express)
-* OpenAI API
-* JWT Authentication
-
-**Frontend**
-
-* React / Next.js
-* Tailwind CSS
-
-**Database**
-
-* PostgreSQL / MongoDB
-
----
-
-## 🔑 OpenAI API Key Setup
-
-This application uses **OpenAI API** for AI-powered ticket processing.
-
-### 1️⃣ Create OpenAI API Key
-
-1. Go to the OpenAI dashboard
-2. Generate a new API key
-3. Copy the key (keep it secure)
-
-### 2️⃣ Add API Key to Environment Variables
-
-#### For Linux / macOS
-
-```bash
-export OPENAI_API_KEY=your_api_key_here
-```
-
-#### For Windows (PowerShell)
-
-```powershell
-setx OPENAI_API_KEY "your_api_key_here"
-```
-
-#### For `.env` file
-
-```env
-OPENAI_API_KEY=your_api_key_here
-```
-
-> ⚠️ **Never commit your API key to GitHub**
+- [Overview](#-overview)
+- [Features](#-features)
+- [Architecture](#-architecture)
+- [Tech Stack](#-tech-stack)
+- [Prerequisites](#-prerequisites)
+- [Installation](#-installation)
+- [Configuration](#-configuration)
+- [Running the Application](#-running-the-application)
+- [API Documentation](#-api-documentation)
+- [Project Structure](#-project-structure)
+- [How It Works](#-how-it-works)
+- [User Roles](#-user-roles)
+- [Development](#-development)
+- [Environment Variables](#-environment-variables)
+- [Troubleshooting](#-troubleshooting)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Support](#-support)
 
 ---
 
-## ⚙️ Installation & Setup
+## 🎯 Overview
 
-### Backend Setup
+**AI Ticket Assistant** is a full-stack web application that revolutionizes support ticket management through AI-powered automation. The system leverages **Google Gemini AI** to intelligently analyze incoming support tickets, automatically categorize them, determine priority levels, generate helpful notes, and intelligently route tickets to the most appropriate team members based on their skills.
 
-```bash
-git clone https://github.com/your-username/ai-ticketing-app.git
-cd ai-ticketing-app/backend
-npm install   # or mvn clean install
-npm run dev   # or mvn spring-boot:run
-```
+### Key Capabilities
 
-### Frontend Setup
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
+- 🤖 **AI-Powered Ticket Analysis**: Automatically summarizes and analyzes ticket content
+- 🏷️ **Smart Categorization**: Identifies ticket types and technical domains
+- ⚡ **Priority Detection**: Determines urgency levels (low, medium, high, urgent)
+- 👥 **Intelligent Routing**: Matches tickets to moderators based on skills and expertise
+- 📧 **Automated Notifications**: Sends email notifications when tickets are assigned
+- 🔐 **Secure Authentication**: JWT-based authentication with role-based access control
+- ⚙️ **Background Processing**: Uses Inngest for reliable, asynchronous ticket processing
 
 ---
 
-## 🧠 How AI Ticketing Works
+## ✨ Features
 
-1. User submits a ticket
-2. Ticket text is sent to OpenAI API
-3. AI performs:
+### Core Features
 
-   * Summarization
-   * Category classification
-   * Priority analysis
-   * Suggested response generation
-4. Ticket is stored with AI insights
-5. Admin/Support team reviews and responds
+#### 🎫 Ticket Management
+- Create, view, update, and manage support tickets
+- Real-time ticket status tracking (TODO, IN_PROGRESS, DONE)
+- Detailed ticket information with AI-generated insights
+- Ticket assignment to moderators and admins
 
----
+#### 🤖 AI Analysis
+- **Automatic Summarization**: Generates concise summaries of ticket content
+- **Priority Detection**: Analyzes urgency and sets priority levels
+- **Helpful Notes**: Provides actionable suggestions for ticket resolution
+- **Skill Matching**: Identifies related technical skills for better routing
 
-## 📌 Sample OpenAI Request (Backend)
+#### 👥 User Management
+- User registration and authentication
+- Role-based access control (User, Moderator, Admin)
+- Skill-based user profiles for intelligent ticket assignment
+- JWT-based secure session management
 
-```js
-const response = await openai.chat.completions.create({
-  model: "gpt-4o-mini",
-  messages: [
-    { role: "system", content: "You are a support ticket analyzer" },
-    { role: "user", content: ticketDescription }
-  ]
-});
-```
+#### 📊 Dashboard
+- Admin dashboard for ticket oversight
+- User dashboard for personal ticket management
+- Real-time ticket status updates
+- Filtering and search capabilities
 
----
-
-## 🔒 Security Best Practices
-
-* Store API keys in environment variables
-* Enable rate limiting
-* Use HTTPS
-* Apply role-based access control
+#### 🔄 Background Processing
+- Asynchronous ticket processing using Inngest
+- Event-driven architecture for scalable operations
+- Retry mechanisms for failed operations
+- Email notifications via Nodemailer
 
 ---
 
-## 📈 Future Enhancements
-
-* AI sentiment analysis
-* Multilingual ticket support
-* Auto ticket escalation
-* SLA prediction using AI
-* Slack / Email integrations
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome!
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
----
-
-## ⭐ Support
-
-If you find this project useful, please ⭐ the repository and share it!
-
-Happy Building 🚀
