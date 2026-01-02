@@ -6,7 +6,7 @@ function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
+  const checkAuth = () => {
     const token = localStorage.getItem("token");
     const userData = localStorage.getItem("user");
     
@@ -23,6 +23,25 @@ function Navbar() {
       setIsAuthenticated(false);
       setUser(null);
     }
+  };
+
+  useEffect(() => {
+    checkAuth();
+    
+    // Listen for storage changes (when login/logout happens in another tab)
+    const handleStorageChange = () => {
+      checkAuth();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also listen for custom events (for same-tab login/logout)
+    window.addEventListener('authChange', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('authChange', handleStorageChange);
+    };
   }, []);
 
   const handleLogout = () => {
@@ -30,6 +49,8 @@ function Navbar() {
     localStorage.removeItem("user");
     setIsAuthenticated(false);
     setUser(null);
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new Event('authChange'));
     navigate("/login");
   };
 
