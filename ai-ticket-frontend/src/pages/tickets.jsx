@@ -8,39 +8,63 @@ function Tickets({ detailspage }) {
   const [tickets, setTickets] = useState([]);
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [createForm, setCreateForm] = useState({ title: "", description: "" });
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
         if (detailspage && id) {
-          // Fetch single ticket details
-          const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/tickets/${id}`, {
+          // Fetch single ticket details - GET /api/tickets/tickets/:id
+          // Backend route: router.get('/tickets/:id') mounted at /api/tickets = /api/tickets/tickets/:id
+          const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/tickets/tickets/${id}`, {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Authorization: `Bearer ${token}`,
             },
           });
 
           const data = await response.json();
 
           if (response.ok) {
-            setTicket(data.ticket || data);
+            setTicket(data);
           } else {
-            alert(data.message || "Failed to fetch ticket.");
+            if (response.status === 401) {
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+              navigate("/login");
+            } else {
+              alert(data.error || data.message || "Failed to fetch ticket.");
+            }
           }
         } else {
-          // Fetch all tickets
-          const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/tickets`, {
+          // Fetch all tickets - GET /api/tickets/tickets
+          // Backend route: router.get('/tickets') mounted at /api/tickets = /api/tickets/tickets
+          const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/tickets/tickets`, {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Authorization: `Bearer ${token}`,
             },
           });
 
           const data = await response.json();
 
           if (response.ok) {
-            setTickets(data.tickets || []);
+            // Backend returns array directly, not wrapped in {tickets: []}
+            setTickets(Array.isArray(data) ? data : []);
           } else {
-            alert(data.message || "Failed to fetch tickets.");
+            if (response.status === 401) {
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+              navigate("/login");
+            } else {
+              alert(data.error || data.message || "Failed to fetch tickets.");
+            }
           }
         }
       } catch (error) {
@@ -52,7 +76,56 @@ function Tickets({ detailspage }) {
     };
 
     fetchData();
-  }, [detailspage, id]);
+  }, [detailspage, id, navigate]);
+
+  const handleCreateTicket = async (e) => {
+    e.preventDefault();
+    if (!createForm.title.trim() || !createForm.description.trim()) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    setCreating(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/tickets/tickets`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: createForm.title.trim(),
+          description: createForm.description.trim(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Refresh tickets list
+        const ticketsResponse = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/tickets/tickets`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const ticketsData = await ticketsResponse.json();
+        if (ticketsResponse.ok) {
+          setTickets(Array.isArray(ticketsData) ? ticketsData : []);
+        }
+        setCreateForm({ title: "", description: "" });
+        setShowCreateForm(false);
+        alert("Ticket created successfully!");
+      } else {
+        alert(data.error || data.message || "Failed to create ticket.");
+      }
+    } catch (error) {
+      console.error("Error creating ticket:", error);
+      alert("An error occurred while creating the ticket.");
+    } finally {
+      setCreating(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -117,7 +190,61 @@ function Tickets({ detailspage }) {
   return (
     <Layout>
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Your Tickets</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">Your Tickets</h2>
+          <button
+            onClick={() => setShowCreateForm(!showCreateForm)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+          >
+            {showCreateForm ? "Cancel" : "+ Create Ticket"}
+          </button>
+        </div>
+
+        {showCreateForm && (
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Create New Ticket</h3>
+            <form onSubmit={handleCreateTicket} className="space-y-4">
+              <div>
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+                  Title <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  placeholder="Enter ticket title"
+                  value={createForm.title}
+                  onChange={(e) => setCreateForm({ ...createForm, title: e.target.value })}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                />
+              </div>
+              <div>
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                  Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  placeholder="Enter ticket description"
+                  value={createForm.description}
+                  onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })}
+                  required
+                  rows={4}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={creating}
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {creating ? "Creating..." : "Create Ticket"}
+              </button>
+            </form>
+          </div>
+        )}
+
         {tickets.length === 0 ? (
           <div className="text-center py-12">
             <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
