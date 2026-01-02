@@ -2,6 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "../component/Layout";
 
+/**
+ * Display either a ticket list (with create form) or a single ticket's details depending on the detailspage prop and route id.
+ *
+ * @param {Object} props
+ * @param {boolean} props.detailspage - If true, show the detail view for the ticket identified by the URL `id`; if false, show the user's ticket list and create form.
+ * @returns {JSX.Element} The rendered Tickets component.
+ */
 function Tickets({ detailspage }) {
   const { id } = useParams();
   const navigate = useNavigate();

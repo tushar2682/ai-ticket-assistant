@@ -2,6 +2,16 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../component/Navbar";
 
+/**
+ * Render the login page and handle user authentication.
+ *
+ * Manages form state, shows validation/loading UI, submits credentials to the server,
+ * and updates client state on success or failure. On successful authentication it
+ * persists the token and user in localStorage, dispatches a global `authChange` event,
+ * and navigates to the app root; on failure it sets an error message displayed to the user.
+ *
+ * @returns {JSX.Element} The login page component.
+ */
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);

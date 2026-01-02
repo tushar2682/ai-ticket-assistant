@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
+/**
+ * Navigation bar component that displays links and authentication controls based on the current auth state.
+ *
+ * The component reads authentication token and user data from localStorage to determine whether a user is authenticated,
+ * subscribes to cross-tab (`storage`) and in-page (`authChange`) events to keep state in sync, and cleans up listeners on unmount.
+ * When logging out it notifies the backend if a token exists, clears localStorage, dispatches an `authChange` event, and navigates to the login page.
+ *
+ * @returns {JSX.Element} The navbar element rendered according to the current authentication state.
+ */
 function Navbar() {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -126,4 +135,3 @@ function Navbar() {
 }
 
 export default Navbar;
-

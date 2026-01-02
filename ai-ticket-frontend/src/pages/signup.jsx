@@ -2,6 +2,16 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../component/Navbar";
 
+/**
+ * Render the signup page with client-side validation and a backend signup flow.
+ *
+ * The component renders a signup form (email, password, confirm password), validates inputs,
+ * submits credentials to the backend, stores authentication data on success, dispatches an
+ * 'authChange' event, and navigates to the dashboard. Displays per-field and general error messages
+ * and shows a loading state while the signup request is in progress.
+ *
+ * @returns {JSX.Element} The signup form UI.
+ */
 function Signup() {
   const [form, setForm] = useState({ 
     email: "", 
