@@ -1,6 +1,13 @@
 import React from "react";
 import Navbar from "./Navbar";
 
+/**
+ * Page shell that renders a persistent Navbar and wraps provided content in a responsive main container.
+ *
+ * @param {Object} props
+ * @param {import('react').ReactNode} props.children - Content to render inside the layout's main area.
+ * @returns {JSX.Element} The layout element containing the Navbar and the centered, padded main region.
+ */
 function Layout({ children }) {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -13,4 +20,3 @@ function Layout({ children }) {
 }
 
 export default Layout;
-

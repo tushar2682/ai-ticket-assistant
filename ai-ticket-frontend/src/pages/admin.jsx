@@ -2,6 +2,15 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../component/Layout";
 
+/**
+ * Render the Admin login page and handle admin authentication flow.
+ *
+ * Manages email/password form state, displays loading and error states, submits credentials to the server,
+ * stores the returned token and user in localStorage on success, dispatches a global `authChange` event,
+ * and navigates to the root path.
+ *
+ * @returns {JSX.Element} The Admin page JSX element.
+ */
 function Admin() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
