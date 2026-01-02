@@ -3,28 +3,76 @@ import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../component/Navbar";
 
 function Signup() {
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ 
+    email: "", 
+    password: "", 
+    confirmPassword: "" 
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError(""); // Clear error when user types
+    // Clear field-specific error
+    if (fieldErrors[e.target.name]) {
+      setFieldErrors({ ...fieldErrors, [e.target.name]: "" });
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+
+    // Email validation
+    if (!form.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      errors.email = "Please enter a valid email address";
+    }
+
+    // Password validation
+    if (!form.password) {
+      errors.password = "Password is required";
+    } else if (form.password.length < 6) {
+      errors.password = "Password must be at least 6 characters";
+    }
+
+    // Confirm password validation
+    if (!form.confirmPassword) {
+      errors.confirmPassword = "Please confirm your password";
+    } else if (form.password !== form.confirmPassword) {
+      errors.confirmPassword = "Passwords do not match";
+    }
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
+    // Validate form
+    if (!validateForm()) {
+      setError("Please fix the errors in the form");
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:5173'}/api/auth/signup`, {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          email: form.email.trim(),
+          password: form.password,
+          skills: [], // Backend expects skills array
+        }),
       });
 
       const data = await response.json();
@@ -34,13 +82,14 @@ function Signup() {
         localStorage.setItem("user", JSON.stringify(data.user));
         // Dispatch custom event to notify Navbar
         window.dispatchEvent(new Event('authChange'));
+        // Redirect to dashboard (tickets page)
         navigate("/");
       } else {
-        setError(data.message || "Signup failed. Please try again.");
+        setError(data.error || data.message || "Signup failed. Please try again.");
       }
     } catch (error) {
       console.error("Error during signup:", error);
-      setError("An error occurred during signup. Please try again.");
+      setError("An error occurred during signup. Please check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -66,7 +115,7 @@ function Signup() {
             <form onSubmit={handleSignup} className="space-y-6">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
+                  Email Address <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="email"
@@ -76,24 +125,55 @@ function Signup() {
                   value={form.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
+                    fieldErrors.email ? 'border-red-300' : 'border-gray-300'
+                  }`}
                 />
+                {fieldErrors.email && (
+                  <p className="mt-1 text-sm text-red-600">{fieldErrors.email}</p>
+                )}
               </div>
 
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                  Password
+                  Password <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="password"
                   id="password"
                   name="password"
-                  placeholder="Create a password"
+                  placeholder="Create a password (min. 6 characters)"
                   value={form.password}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
+                    fieldErrors.password ? 'border-red-300' : 'border-gray-300'
+                  }`}
                 />
+                {fieldErrors.password && (
+                  <p className="mt-1 text-sm text-red-600">{fieldErrors.password}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                  Confirm Password <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  placeholder="Confirm your password"
+                  value={form.confirmPassword}
+                  onChange={handleChange}
+                  required
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
+                    fieldErrors.confirmPassword ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                />
+                {fieldErrors.confirmPassword && (
+                  <p className="mt-1 text-sm text-red-600">{fieldErrors.confirmPassword}</p>
+                )}
               </div>
 
               <button

@@ -32,6 +32,8 @@ function Admin() {
       if (response.ok) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
+        // Dispatch custom event to notify Navbar
+        window.dispatchEvent(new Event('authChange'));
         navigate("/");
       } else {
         setError(data.message || "Admin access failed");

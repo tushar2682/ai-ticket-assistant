@@ -34,13 +34,14 @@ function Login() {
         localStorage.setItem("user", JSON.stringify(data.user));
         // Dispatch custom event to notify Navbar
         window.dispatchEvent(new Event('authChange'));
+        // Redirect to dashboard (tickets page)
         navigate("/");
       } else {
-        setError(data.message || "Login failed. Please check your credentials.");
+        setError(data.error || data.message || "Login failed. Please check your credentials.");
       }
     } catch (error) {
       console.error("Error during login:", error);
-      setError("An error occurred during login. Please try again.");
+      setError("An error occurred during login. Please check your connection and try again.");
     } finally {
       setLoading(false);
     }

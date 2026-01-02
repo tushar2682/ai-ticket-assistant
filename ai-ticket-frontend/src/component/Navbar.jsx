@@ -44,14 +44,31 @@ function Navbar() {
     };
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setIsAuthenticated(false);
-    setUser(null);
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new Event('authChange'));
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        // Call backend logout endpoint
+        await fetch(`${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/auth/logout`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    } finally {
+      // Clear local storage regardless of API call result
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setIsAuthenticated(false);
+      setUser(null);
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new Event('authChange'));
+      navigate("/login");
+    }
   };
 
   return (
