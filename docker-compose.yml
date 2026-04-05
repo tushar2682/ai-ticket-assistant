@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7-jammy
+    container_name: ai-ticket-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: ai_ticket_assistant
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    ports:
+      - "27017:27017"
+    networks:
+      - ai-ticket-network
+
+  # Backend API Service
+  backend:
+    build:
+      context: ./ai-ticket assistant
+      dockerfile: Dockerfile
+    container_name: ai-ticket-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      MONGO_URL: mongodb://admin:password@mongodb:27017/ai_ticket_assistant?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:-your_jwt_secret_here}
+      MAILTRAP_SMTP_HOST: ${MAILTRAP_SMTP_HOST:-sandbox.smtp.mailtrap.io}
+      MAILTRAP_SMTP_PORT: ${MAILTRAP_SMTP_PORT:-2525}
+      MAILTRAP_SMTP_USER: ${MAILTRAP_SMTP_USER:-bc51627df87f87}
+      MAILTRAP_SMTP_PASS: ${MAILTRAP_SMTP_PASS:-your_mailtrap_password}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-your_gemini_api_key}
+      APP_URL: http://backend:3000
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    networks:
+      - ai-ticket-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./ai-ticket-frontend
+      dockerfile: Dockerfile
+    container_name: ai-ticket-frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_BASE_URL: http://backend:3000/api
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - ai-ticket-network
+
+volumes:
+  mongodb_data:
+  mongodb_config:
+
+networks:
+  ai-ticket-network:
+    driver: bridge
